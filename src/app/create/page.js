@@ -1,5 +1,6 @@
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
+import { revalidateTag } from "next/cache"
 import { createPost } from "@/data/posts"
 import { getUserIdByToken } from "@/data/users"
 import { initDatabase } from "@/db/init"
@@ -17,6 +18,8 @@ export default function CreatePostPage() {
       title: formData.get('title'),
       contents: formData.get('contents')
     });
+    
+    revalidateTag('posts');
 
     redirect(`/posts/${post._id}`);
   }

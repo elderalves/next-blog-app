@@ -1,4 +1,5 @@
 import 'server-only';
+import { unstable_cache as cache } from 'next/cache';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User } from '@/db/models';
@@ -26,17 +27,20 @@ export async function loginUser({ username, password }) {
   return token;
 }
 
-export async function getUserInfoById(userId) {
-  const user = await User.findById(userId);
+export const getUserInfoById = cache(
+  async function getUserInfoById(userId) {
+    const user = await User.findById(userId);
 
-  if(!user) {
-    throw new Error('user not found!');
-  }
+    if(!user) {
+      throw new Error('user not found!');
+    }
 
-  return {
-    username: user.username,
-  }
-}
+    return {
+      username: user.username,
+    }
+  },
+  ['users', 'getUserInfoById']
+)
 
 export function getUserIdByToken(token) {
   if(!token) {
